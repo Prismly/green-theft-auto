@@ -14,6 +14,8 @@ public class CameraController : MonoBehaviour
     private bool turning = false;
     private int pathIndex;
 
+    [SerializeField] float t;
+
     private void OnDrawGizmos()
     {
         Vector3 startOfSeg;
@@ -45,11 +47,19 @@ public class CameraController : MonoBehaviour
                 // There is at least one more segment for the camera to follow; start following it
                 pathIndex++;
                 targetPathPoint = pathTransform.GetChild(pathIndex);
+                turning = true;
             }
             else
             {
                 followingPath = false;
             }
+        }
+
+        if (turning)
+        {
+            Debug.Log("turning");
+            Quaternion targetRotation = Quaternion.LookRotation(targetPathPoint.position - transform.position, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, t);
         }
 
         if (followingPath)

@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class PlayerTruck : MonoBehaviour
 {
-    [Header("Handling")]
-    [SerializeField] [Tooltip("The base speed, in units per second, of the player truck")] private float baseSpeed;
+    [Header("Driving")]
+    [SerializeField] [Tooltip("The starting speed and current speed, in units per second, of the player truck")] private float speed;
+    [SerializeField] [Tooltip("The maximum speed, in units per second, of the player truck")] private float maxSpeed;
+    [SerializeField] [Tooltip("The minimum speed, in units per second, of the player truck")] private float minSpeed;
+    [SerializeField] [Tooltip("Acceleration/deceleration of the truck's speed, in units per second^2")] private float driveAccel;
+    [Header("Turning")]
     [SerializeField] [Tooltip("Max angle from 0 (straight) at which the truck can be facing")] private float maxFacingAngle;
     [SerializeField] [Tooltip("Acceleration of the truck's turning, in degrees per second^2")] private float turnAccel;
     [SerializeField] [Tooltip("")] private float maxDeltaAngle;
@@ -22,32 +26,56 @@ public class PlayerTruck : MonoBehaviour
     {
         float timeScaledDeltaAngle = ProcessTurnInput();
 
+        // Rotate the truck according to the value determined by ProcessTurnInput().
         facingAngle += timeScaledDeltaAngle;
         transform.Rotate(new Vector3(0, timeScaledDeltaAngle, 0));
-        transform.position += transform.forward * baseSpeed * Time.deltaTime;
 
         if (Input.GetKey(gasKey) && !Input.GetKey(brakeKey))
         {
             // Player is ACCELERATING
-
+            speed += driveAccel;
+            if (speed > maxSpeed)
+            {
+                // Speed has accelerated past what is allowed; cap it
+                speed = maxSpeed;
+            }
         }
         else if (!Input.GetKey(gasKey) && Input.GetKey(brakeKey))
         {
             // Player is BRAKING (moving backward)
-
+            speed -= driveAccel;
+            if (speed < minSpeed)
+            {
+                // Speed has decelerated past what is allowed; cap it
+                speed = minSpeed;
+            }
         }
 
-        Debug.Log("facingAngle: " + facingAngle + "   deltaAngle: " + deltaAngle + "   timeScaledDeltaAngle: " + timeScaledDeltaAngle);
+        // Move the truck according to the current value of baseSpeed.
+        transform.position += transform.forward * speed * Time.deltaTime;
+
+        //Debug.Log("speed: " + speed);
+        //Debug.Log("facingAngle: " + facingAngle + "   deltaAngle: " + deltaAngle + "   timeScaledDeltaAngle: " + timeScaledDeltaAngle);
     }
 
+    /**
+     * Given the left/right input the player is holding, determines by how much the truck should be rotating this frame.
+     * @return the degrees by which the truck should rotate per second, multiplied by Time.deltaTime.
+     */
     private float ProcessTurnInput()
     {
         if (Input.GetKey(leftKey) && !Input.GetKey(rightKey))
         {
             // Player holding LEFT turn key
             deltaAngle -= turnAccel;
+            if (deltaAngle > 0)
+            {
+                // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual
+                deltaAngle -= turnDecel;
+            }
             if (deltaAngle < -maxDeltaAngle)
             {
+                // Rotation speed has accelerated past what is allowed; cap it
                 deltaAngle = -maxDeltaAngle;
             }
         }
@@ -55,8 +83,14 @@ public class PlayerTruck : MonoBehaviour
         {
             // Player holding RIGHT turn key
             deltaAngle += turnAccel;
+            if (deltaAngle < 0)
+            {
+                // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual
+                deltaAngle += turnDecel;
+            }
             if (deltaAngle > maxDeltaAngle)
             {
+                // Rotation speed has accelerated past what is allowed; cap it
                 deltaAngle = maxDeltaAngle;
             }
         }
