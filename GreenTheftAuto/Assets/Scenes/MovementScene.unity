@@ -774,9 +774,9 @@ MonoBehaviour:
   playerTransform: {fileID: 374340947}
   pathTransform: {fileID: 588773278}
   followSpeed: 6
-  turnSpeed: 0
+  slerpTime: 1
   offset: {x: 0, y: 3, z: -7}
-  t: 0.01
+  debugSphereBottomText: {fileID: 7740412837625112906, guid: 05b5427a5dc0b1544b1c00130041475d, type: 3}
 --- !u!1 &994523344
 GameObject:
   m_ObjectHideFlags: 0

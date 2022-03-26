@@ -7,14 +7,14 @@ public class CameraController : MonoBehaviour
     [SerializeField] [Tooltip("")] private Transform playerTransform;
     [SerializeField] [Tooltip("")] private Transform pathTransform;
     [SerializeField] [Tooltip("")] private float followSpeed;
-    [SerializeField] [Tooltip("")] private float turnSpeed;
+    [SerializeField] [Tooltip("The time it should take for the camera to rotate between two points, in seconds")] private float slerpTime;
     private Transform targetPathPoint;
     [SerializeField] [Tooltip("")] private Vector3 offset;
     private bool followingPath = true;
     private bool turning = false;
     private int pathIndex;
-
-    [SerializeField] float t;
+    private Transform rotTarget = null;
+    [SerializeField] GameObject debugSphereBottomText;
 
     private void OnDrawGizmos()
     {
@@ -33,13 +33,14 @@ public class CameraController : MonoBehaviour
     private void Start()
     {
         pathIndex = 0;
-        targetPathPoint = pathTransform.GetChild(0);
-        turning = true;
+        targetPathPoint = pathTransform.GetChild(1);
     }
 
     private void Update()
     {
-        if (Vector3.Distance(transform.position, targetPathPoint.position) < 0.1f)
+        float distFromTarget = Vector3.Distance(transform.position, targetPathPoint.position);
+
+        if (distFromTarget < 0.1f)
         {
             // The camera has finished traveling along the current path segment
             if (pathIndex < pathTransform.childCount - 1)
@@ -47,7 +48,6 @@ public class CameraController : MonoBehaviour
                 // There is at least one more segment for the camera to follow; start following it
                 pathIndex++;
                 targetPathPoint = pathTransform.GetChild(pathIndex);
-                turning = true;
             }
             else
             {
@@ -55,12 +55,33 @@ public class CameraController : MonoBehaviour
             }
         }
 
-        if (turning)
+        bool doSlerp = false;
+
+        if (distFromTarget < slerpTime * followSpeed / 2 && pathIndex < pathTransform.childCount - 1)
         {
-            Debug.Log("turning");
-            Quaternion targetRotation = Quaternion.LookRotation(targetPathPoint.position - transform.position, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, t);
+            Debug.Log("doSlerp");
+            Debug.Log(slerpTime * followSpeed / 2);
+            rotTarget = pathTransform.GetChild(pathIndex + 1);
+            GameObject newDebugSphereBottomText = Instantiate(debugSphereBottomText);
+            newDebugSphereBottomText.transform.position = rotTarget.position;
+            doSlerp = true;
+            turning = true;
         }
+        else if (rotTarget != null)
+        {
+            doSlerp = true;
+        }
+
+        if (doSlerp)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(rotTarget.position - transform.position, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, slerpTime * Time.deltaTime);
+            if (Quaternion.Angle(targetRotation, transform.rotation) < 0.1f)
+            {
+                // The camera has finished rotating; no need to call Slerp until next path point
+                rotTarget = null;
+            }
+        }  
 
         if (followingPath)
         {
