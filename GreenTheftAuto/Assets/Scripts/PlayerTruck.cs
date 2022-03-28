@@ -11,16 +11,29 @@ public class PlayerTruck : MonoBehaviour
     [SerializeField] [Tooltip("Acceleration/deceleration of the truck's speed, in units per second^2")] private float driveAccel;
     [Header("Turning")]
     [SerializeField] [Tooltip("Max angle from 0 (straight) at which the truck can be facing")] private float maxFacingAngle;
+    private float angleHighBound;
+    private float angleLowBound;
     [SerializeField] [Tooltip("Acceleration of the truck's turning, in degrees per second^2")] private float turnAccel;
     [SerializeField] [Tooltip("")] private float maxDeltaAngle;
     [SerializeField] [Tooltip("Deceleration of the truck's turning, in degrees per second^2")] private float turnDecel;
-    private float facingAngle = 0; // Negative when facing left, positive when facing right. Zero is straight ahead
+    private float facingAngle = 0;
+    [Header("Path")]
+    [SerializeField] [Tooltip("")] private Transform pathTransform;
+    private int pathIndex = 0;
+
+    private Quaternion homeDirection; // The "straight ahead" direction, on which the player's maximum and minimum angles will be based
     private float deltaAngle = 0; // Saves the number of degrees rotated this frame, so the game object itself can be rotated later
 
     private KeyCode leftKey = KeyCode.LeftArrow;
     private KeyCode rightKey = KeyCode.RightArrow;
     private KeyCode gasKey = KeyCode.UpArrow;
     private KeyCode brakeKey = KeyCode.DownArrow;
+
+    private void Start()
+    {
+        angleHighBound = maxFacingAngle;
+        angleLowBound = -maxFacingAngle;
+    }
 
     private void Update()
     {
@@ -121,17 +134,24 @@ public class PlayerTruck : MonoBehaviour
 
         // Clamp deltaAngle if its value is high enough to turn the truck past the set max turn angle
         float timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
-        if (facingAngle + timeScaledDeltaAngle > maxFacingAngle)
+        if (facingAngle + timeScaledDeltaAngle > angleHighBound)
         {
-            deltaAngle = maxFacingAngle - facingAngle;
+            deltaAngle = angleHighBound - facingAngle;
             timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
         }
-        else if (facingAngle + timeScaledDeltaAngle < -maxFacingAngle)
+        else if (facingAngle + timeScaledDeltaAngle < angleLowBound)
         {
-            deltaAngle = -maxFacingAngle - facingAngle;
+            deltaAngle = angleLowBound - facingAngle;
             timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
         }
-        
+
         return timeScaledDeltaAngle;
+    }
+
+    public void SetHomeAngle(float newHomeAngle)
+    {
+        angleHighBound = newHomeAngle + maxFacingAngle;
+        angleLowBound = newHomeAngle - maxFacingAngle;
+        Debug.Log("New angle bounds: " + angleLowBound + " to " + angleHighBound);
     }
 }

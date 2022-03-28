@@ -5,35 +5,28 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [SerializeField] [Tooltip("")] private Transform playerTransform;
-    [SerializeField] [Tooltip("")] private Transform pathTransform;
+    [SerializeField] [Tooltip("")] private Transform currentTrack;
     [SerializeField] [Tooltip("")] private float followSpeed;
     [SerializeField] [Tooltip("The time it should take for the camera to rotate between two points, in seconds")] private float slerpTime;
     private Transform targetPathPoint;
-    [SerializeField] [Tooltip("")] private Vector3 offset;
-    private bool followingPath = true;
+    [SerializeField] [Tooltip("")] private Vector3 offsetRotation;
+    private bool followingTrack = true;
     private bool turning = false;
     private int pathIndex;
+    private int lookIndex;
     private Transform rotTarget = null;
     [SerializeField] GameObject debugSphereBottomText;
 
-    private void OnDrawGizmos()
-    {
-        Vector3 startOfSeg;
-        Vector3 endOfSeg;
-        Color[] rainbow = { Color.red, new Color(1, 0.5f, 0), Color.yellow, Color.green, Color.blue, new Color(0.5f, 0, 1), Color.magenta }; 
-        for (int i = 0; i < pathTransform.childCount - 1; i++)
-        {
-            startOfSeg = pathTransform.GetChild(i).position;
-            endOfSeg = pathTransform.GetChild(i + 1).position;
-            Gizmos.color = rainbow[i % rainbow.Length];
-            Gizmos.DrawLine(startOfSeg, endOfSeg);
-        }
-    }
-
     private void Start()
     {
+        InitializePathVars();
+    }
+
+    private void InitializePathVars()
+    {
         pathIndex = 0;
-        targetPathPoint = pathTransform.GetChild(1);
+        lookIndex = 1;
+        targetPathPoint = currentTrack.GetChild(1);
     }
 
     private void Update()
@@ -43,29 +36,30 @@ public class CameraController : MonoBehaviour
         if (distFromTarget < 0.1f)
         {
             // The camera has finished traveling along the current path segment
-            if (pathIndex < pathTransform.childCount - 1)
+            if (pathIndex < currentTrack.childCount - 1)
             {
                 // There is at least one more segment for the camera to follow; start following it
                 pathIndex++;
-                targetPathPoint = pathTransform.GetChild(pathIndex);
+                targetPathPoint = currentTrack.GetChild(pathIndex + 1);
+                distFromTarget = Vector3.Distance(transform.position, targetPathPoint.position);
             }
             else
             {
-                followingPath = false;
+                followingTrack = false;
             }
         }
 
         bool doSlerp = false;
 
-        if (distFromTarget < slerpTime * followSpeed / 2 && pathIndex < pathTransform.childCount - 1)
+        if (distFromTarget < slerpTime * followSpeed / 2 && pathIndex < currentTrack.childCount - 1 && pathIndex == lookIndex - 1)
         {
-            Debug.Log("doSlerp");
-            Debug.Log(slerpTime * followSpeed / 2);
-            rotTarget = pathTransform.GetChild(pathIndex + 1);
+            //Debug.Log("doSlerp");
+            //Debug.Log(slerpTime * followSpeed / 2);
+            lookIndex++;
+            rotTarget = currentTrack.GetChild(lookIndex);
             GameObject newDebugSphereBottomText = Instantiate(debugSphereBottomText);
             newDebugSphereBottomText.transform.position = rotTarget.position;
             doSlerp = true;
-            turning = true;
         }
         else if (rotTarget != null)
         {
@@ -75,6 +69,7 @@ public class CameraController : MonoBehaviour
         if (doSlerp)
         {
             Quaternion targetRotation = Quaternion.LookRotation(rotTarget.position - transform.position, Vector3.up);
+            targetRotation.eulerAngles = targetRotation.eulerAngles + offsetRotation;
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, slerpTime * Time.deltaTime);
             if (Quaternion.Angle(targetRotation, transform.rotation) < 0.1f)
             {
@@ -83,9 +78,30 @@ public class CameraController : MonoBehaviour
             }
         }  
 
-        if (followingPath)
+        if (followingTrack)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPathPoint.position, followSpeed * Time.deltaTime);
         }
+    }
+
+    IEnumerator LookAtPoint()
+    {
+        yield return null;
+    }
+
+    public Transform GetCurrentTrack()
+    {
+        return currentTrack;
+    }
+
+    public void SetCurrentTrack(Transform newTrack)
+    {
+        currentTrack = newTrack;
+        InitializePathVars();
+    }
+
+    public void SetRotTarget(Transform newRotTarget)
+    {
+        rotTarget = newRotTarget;
     }
 }
