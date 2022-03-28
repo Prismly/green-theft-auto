@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] [Tooltip("")] private Transform playerTransform;
-    [SerializeField] [Tooltip("")] private Transform currentTrack;
-    [SerializeField] [Tooltip("")] private float followSpeed;
+    [SerializeField] [Tooltip("The player character object")] private Transform playerTransform;
+    [SerializeField] [Tooltip("The track that the camera is currently following")] private Transform currentTrack;
+    [SerializeField] [Tooltip("The speed at which the camera moves along its current track, in units / second")] private float followSpeed;
     [SerializeField] [Tooltip("The time it should take for the camera to rotate between two points, in seconds")] private float slerpTime;
     private Transform targetPathPoint;
-    [SerializeField] [Tooltip("")] private Vector3 offsetRotation;
+    [SerializeField] [Tooltip("Determines how much extra rotation is given to the camera, in addition to what is applied to make it look at the next track point")] private Vector3 offsetRotation;
     private bool followingTrack = true;
     private bool turning = false;
     private int pathIndex;
@@ -53,8 +53,6 @@ public class CameraController : MonoBehaviour
 
         if (distFromTarget < slerpTime * followSpeed / 2 && pathIndex < currentTrack.childCount - 1 && pathIndex == lookIndex - 1)
         {
-            //Debug.Log("doSlerp");
-            //Debug.Log(slerpTime * followSpeed / 2);
             lookIndex++;
             rotTarget = currentTrack.GetChild(lookIndex);
             GameObject newDebugSphereBottomText = Instantiate(debugSphereBottomText);
@@ -84,10 +82,10 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    IEnumerator LookAtPoint()
-    {
-        yield return null;
-    }
+    //IEnumerator LookAtPoint()
+    //{
+    //    yield return null;
+    //}
 
     public Transform GetCurrentTrack()
     {

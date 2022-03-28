@@ -390,7 +390,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCam: {fileID: 963194229}
-  isPreemptive: 0
 --- !u!1 &374340943
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,14 +502,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 6
-  maxSpeed: 8
-  minSpeed: 3
-  driveAccel: 0.1
-  maxFacingAngle: 60
+  maxSpeed: 9
+  minSpeed: 2
+  driveAccel: 10
+  angleHighBound: 60
+  angleLowBound: -60
   turnAccel: 4
   maxDeltaAngle: 150
   turnDecel: 6
-  pathTransform: {fileID: 0}
+  leftKey: 276
+  rightKey: 275
+  gasKey: 273
+  brakeKey: 274
 --- !u!54 &374340949
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -845,7 +848,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCam: {fileID: 963194229}
-  isPreemptive: 1
 --- !u!4 &662854572
 Transform:
   m_ObjectHideFlags: 0
@@ -1014,7 +1016,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCam: {fileID: 963194229}
-  isPreemptive: 0
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,7 +1278,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCam: {fileID: 963194229}
-  isPreemptive: 0
 --- !u!1 &1250324128
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,75 +5,48 @@ using UnityEngine;
 public class PlayerTruck : MonoBehaviour
 {
     [Header("Driving")]
-    [SerializeField] [Tooltip("The starting speed and current speed, in units per second, of the player truck")] private float speed;
+    [SerializeField] [Tooltip("The current speed, in units per second, of the player truck")] private float speed;
     [SerializeField] [Tooltip("The maximum speed, in units per second, of the player truck")] private float maxSpeed;
     [SerializeField] [Tooltip("The minimum speed, in units per second, of the player truck")] private float minSpeed;
     [SerializeField] [Tooltip("Acceleration/deceleration of the truck's speed, in units per second^2")] private float driveAccel;
+    
+    private float facingAngle = 0; // The angle, from 0 (facing z+ axis) at which the truck is currently facing. Bounds are defined by angleHighBound and angleLowBound
+    private Quaternion homeDirection; // The "straight ahead" direction, on which the player's maximum and minimum angles will be based
     [Header("Turning")]
-    [SerializeField] [Tooltip("Max angle from 0 (straight) at which the truck can be facing")] private float maxFacingAngle;
-    private float angleHighBound;
-    private float angleLowBound;
+    [SerializeField] [Tooltip("The maximum value currently allowed for facingAngle")] private float angleHighBound; 
+    [SerializeField] [Tooltip("The minimum value currently allowed for facingAngle")] private float angleLowBound;
     [SerializeField] [Tooltip("Acceleration of the truck's turning, in degrees per second^2")] private float turnAccel;
     [SerializeField] [Tooltip("")] private float maxDeltaAngle;
     [SerializeField] [Tooltip("Deceleration of the truck's turning, in degrees per second^2")] private float turnDecel;
-    private float facingAngle = 0;
-    [Header("Path")]
-    [SerializeField] [Tooltip("")] private Transform pathTransform;
-    private int pathIndex = 0;
-
-    private Quaternion homeDirection; // The "straight ahead" direction, on which the player's maximum and minimum angles will be based
-    private float deltaAngle = 0; // Saves the number of degrees rotated this frame, so the game object itself can be rotated later
-
-    private KeyCode leftKey = KeyCode.LeftArrow;
-    private KeyCode rightKey = KeyCode.RightArrow;
-    private KeyCode gasKey = KeyCode.UpArrow;
-    private KeyCode brakeKey = KeyCode.DownArrow;
+    private float deltaAngle = 0; // Saves the number of degrees rotated during the most recent frame, so accel/deceleration can be applied
+    
+    [Header("Keybinds")]
+    [SerializeField] [Tooltip("Turns the truck left when held")] private KeyCode leftKey = KeyCode.LeftArrow;
+    [SerializeField] [Tooltip("Turns the truck right when held")] private KeyCode rightKey = KeyCode.RightArrow;
+    [SerializeField] [Tooltip("Increases the truck's forward speed when held")] private KeyCode gasKey = KeyCode.UpArrow;
+    [SerializeField] [Tooltip("Decreases the truck's forward speed when held")] private KeyCode brakeKey = KeyCode.DownArrow;
 
     private void Start()
     {
-        angleHighBound = maxFacingAngle;
-        angleLowBound = -maxFacingAngle;
+        // Initialize the angle the truck is facing as being between its two bounds.
+        facingAngle = (angleHighBound + angleLowBound) / 2;
     }
 
     private void Update()
     {
+        // Determine, from the player's left/right inputs and previous rotation speed, how much the truck should rotate this frame.
         float timeScaledDeltaAngle = ProcessTurnInput();
-
         // Rotate the truck according to the value determined by ProcessTurnInput().
-        facingAngle += timeScaledDeltaAngle;
         transform.Rotate(new Vector3(0, timeScaledDeltaAngle, 0));
 
-        if (Input.GetKey(gasKey) && !Input.GetKey(brakeKey))
-        {
-            // Player is ACCELERATING
-            speed += driveAccel;
-            if (speed > maxSpeed)
-            {
-                // Speed has accelerated past what is allowed; cap it
-                speed = maxSpeed;
-            }
-        }
-        else if (!Input.GetKey(gasKey) && Input.GetKey(brakeKey))
-        {
-            // Player is BRAKING (moving backward)
-            speed -= driveAccel;
-            if (speed < minSpeed)
-            {
-                // Speed has decelerated past what is allowed; cap it
-                speed = minSpeed;
-            }
-        }
-
-        // Move the truck according to the current value of baseSpeed.
-        transform.position += transform.forward * speed * Time.deltaTime;
-
-        //Debug.Log("speed: " + speed);
-        //Debug.Log("facingAngle: " + facingAngle + "   deltaAngle: " + deltaAngle + "   timeScaledDeltaAngle: " + timeScaledDeltaAngle);
+        // Determine, from the player's gas/brake inputs and previous forward speed, how much the truck should move forward this frame.
+        float timeScaledSpeed = ProcessForwardInput();
+        // Move the truck according to the value determined by ProcessForwardInput().
+        transform.position += transform.forward * timeScaledSpeed;
     }
 
-    /**
-     * Given the left/right input the player is holding, determines by how much the truck should be rotating this frame.
-     * @return the degrees by which the truck should rotate per second, multiplied by Time.deltaTime.
+    /*
+     * Given the left/right input the player is holding, determines by how much the truck should be rotating this frame and returns that value as a float.
      */
     private float ProcessTurnInput()
     {
@@ -109,15 +82,16 @@ public class PlayerTruck : MonoBehaviour
         }
         else
         {
-            // Player IS NOT holding a turning key
+            // Player IS NOT holding a turning key (or holding both, which has the same result)
             if (deltaAngle != 0)
             {
-                // Some amount of rotation is happening on this frame, so we should decelerate the rotation
+                // Some amount of rotation is happening on this frame, so we should decelerate the rotation.
                 if (deltaAngle > 0)
                 {
                     deltaAngle -= turnDecel;
                     if (deltaAngle < 0)
                     {
+                        // We've decelerated so much, we've begun turning in the other direction! Stop rotation entirely.
                         deltaAngle = 0;
                     }
                 }
@@ -126,13 +100,14 @@ public class PlayerTruck : MonoBehaviour
                     deltaAngle += turnDecel;
                     if (deltaAngle > 0)
                     {
+                        // We've decelerated so much, we've begun turning in the other direction! Stop rotation entirely.
                         deltaAngle = 0;
                     }
                 }
             }
         }
 
-        // Clamp deltaAngle if its value is high enough to turn the truck past the set max turn angle
+        // Clamp deltaAngle if its value is high/low enough to turn the truck past the set max/min turn angle.
         float timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
         if (facingAngle + timeScaledDeltaAngle > angleHighBound)
         {
@@ -145,13 +120,45 @@ public class PlayerTruck : MonoBehaviour
             timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
         }
 
+        // Update the variable tracking the truck's current angle, and return by how much it should rotate this frame.
+        facingAngle += timeScaledDeltaAngle;
         return timeScaledDeltaAngle;
     }
 
+    private float ProcessForwardInput()
+    {
+        if (Input.GetKey(gasKey) && !Input.GetKey(brakeKey))
+        {
+            // Player is SPEEDING UP
+            speed += driveAccel * Time.deltaTime;
+            if (speed > maxSpeed)
+            {
+                // Speed has accelerated past what is allowed; cap it
+                speed = maxSpeed;
+            }
+        }
+        else if (!Input.GetKey(gasKey) && Input.GetKey(brakeKey))
+        {
+            // Player is SLOWING DOWN
+            speed -= driveAccel * Time.deltaTime;
+            if (speed < minSpeed)
+            {
+                // Speed has decelerated past what is allowed; cap it
+                speed = minSpeed;
+            }
+        }
+
+        return speed * Time.deltaTime;
+    }
+
+    /*
+     * Rather than maintain a homeAngle variable, which won't be useful later, immediately update
+     * the facingAngle's high and low bounds to reflect the new home angle, which defines where is "straight ahead".
+     */
     public void SetHomeAngle(float newHomeAngle)
     {
-        angleHighBound = newHomeAngle + maxFacingAngle;
-        angleLowBound = newHomeAngle - maxFacingAngle;
-        Debug.Log("New angle bounds: " + angleLowBound + " to " + angleHighBound);
+        float halfOfRange = (angleHighBound - angleLowBound) / 2;
+        angleHighBound = newHomeAngle + halfOfRange;
+        angleLowBound = newHomeAngle - halfOfRange;
     }
 }
