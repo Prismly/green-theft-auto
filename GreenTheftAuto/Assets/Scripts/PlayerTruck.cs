@@ -10,7 +10,7 @@ public class PlayerTruck : MonoBehaviour
     [SerializeField] [Tooltip("The minimum speed, in units per second, of the player truck")] private float minSpeed;
     [SerializeField] [Tooltip("Acceleration/deceleration of the truck's speed, in units per second^2")] private float driveAccel;
     
-    private float facingAngle = 0; // The angle, from 0 (facing z+ axis) at which the truck is currently facing. Bounds are defined by angleHighBound and angleLowBound
+    [SerializeField] private float facingAngle = 0; // The angle, from 0 (facing z+ axis) at which the truck is currently facing. Bounds are defined by angleHighBound and angleLowBound
     private Quaternion homeDirection; // The "straight ahead" direction, on which the player's maximum and minimum angles will be based
     [Header("Turning")]
     [SerializeField] [Tooltip("The maximum value currently allowed for facingAngle")] private float angleHighBound; 
@@ -56,8 +56,8 @@ public class PlayerTruck : MonoBehaviour
             deltaAngle -= turnAccel;
             if (deltaAngle > 0)
             {
-                // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual
-                deltaAngle -= turnDecel;
+                // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual ~~REWRITE~~
+                deltaAngle = 0;
             }
             if (deltaAngle < -maxDeltaAngle)
             {
@@ -71,8 +71,8 @@ public class PlayerTruck : MonoBehaviour
             deltaAngle += turnAccel;
             if (deltaAngle < 0)
             {
-                // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual
-                deltaAngle += turnDecel;
+                // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual ~~REWRITE~~
+                deltaAngle = 0;
             }
             if (deltaAngle > maxDeltaAngle)
             {
@@ -111,13 +111,29 @@ public class PlayerTruck : MonoBehaviour
         float timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
         if (facingAngle + timeScaledDeltaAngle > angleHighBound)
         {
-            deltaAngle = angleHighBound - facingAngle;
-            timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
+            if (facingAngle < angleHighBound)
+            {
+                deltaAngle = angleHighBound - facingAngle;
+                timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
+            }
+            else if (timeScaledDeltaAngle >= 0)
+            {
+                deltaAngle = 0;
+                timeScaledDeltaAngle = 0;
+            }
         }
         else if (facingAngle + timeScaledDeltaAngle < angleLowBound)
         {
-            deltaAngle = angleLowBound - facingAngle;
-            timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
+            if (facingAngle > angleLowBound)
+            {
+                deltaAngle = angleLowBound - facingAngle;
+                timeScaledDeltaAngle = deltaAngle * Time.deltaTime;
+            }
+            else if (timeScaledDeltaAngle <= 0)
+            {
+                deltaAngle = 0;
+                timeScaledDeltaAngle = 0;
+            }
         }
 
         // Update the variable tracking the truck's current angle, and return by how much it should rotate this frame.

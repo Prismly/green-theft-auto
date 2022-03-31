@@ -889,10 +889,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 374340947}
   currentTrack: {fileID: 588773278}
-  followSpeed: 6
+  followSpeed: 4
   slerpTime: 1
   offsetRotation: {x: 10, y: 0, z: 0}
   debugSphereBottomText: {fileID: 7740412837625112906, guid: 05b5427a5dc0b1544b1c00130041475d, type: 3}
+--- !u!4 &990813239 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+  m_PrefabInstance: {fileID: 1656380811}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1080504549
 GameObject:
   m_ObjectHideFlags: 0
@@ -957,6 +962,7 @@ Transform:
   - {fileID: 455203911}
   - {fileID: 1647847677}
   - {fileID: 629587694}
+  - {fileID: 990813239}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1271,6 +1277,63 @@ Transform:
   m_Father: {fileID: 1106122672}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1656380811
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1106122672}
+    m_Modifications:
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15.043566
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7901354
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.853865
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734005, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174495392637734009, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
+      propertyPath: m_Name
+      value: Ground (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6142319abf3643e4086571e1d247e5f3, type: 3}
 --- !u!1 &1979530858
 GameObject:
   m_ObjectHideFlags: 0
@@ -1473,6 +1536,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2194837375916490017, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
+      propertyPath: turnAccel
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2194837375916490017, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
+      propertyPath: turnDecel
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 2194837375916490022, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
       propertyPath: m_RootOrder
       value: 3
