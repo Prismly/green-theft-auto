@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour
 {
     [SerializeField] [Tooltip("The player character object")] private Transform playerTransform;
     [SerializeField] [Tooltip("The track that the camera is currently following")] private Transform currentTrack;
+    private Transform originalTrackDebug;
     [SerializeField] [Tooltip("The speed at which the camera moves along its current track, in units / second")] private float followSpeed;
     [SerializeField] [Tooltip("The time it should take for the camera to rotate between two points, in seconds")] private float slerpTime;
     private Transform targetPathPoint;
@@ -19,6 +20,7 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
+        originalTrackDebug = currentTrack;
         InitializePathVars();
     }
 
@@ -31,6 +33,11 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            DebugReset();
+        }
+
         float distFromTarget = Vector3.Distance(transform.position, targetPathPoint.position);
 
         if (distFromTarget < 0.1f)
@@ -101,5 +108,18 @@ public class CameraController : MonoBehaviour
     public void SetRotTarget(Transform newRotTarget)
     {
         rotTarget = newRotTarget;
+    }
+
+    private void DebugReset()
+    {
+        playerTransform.position = new Vector3(0, 0, -3);
+        playerTransform.rotation = Quaternion.Euler(0, 0, 0);
+        transform.position = new Vector3(0, 3, -10);
+        transform.rotation = Quaternion.Euler(10, 0, 0);
+        currentTrack = originalTrackDebug;
+        InitializePathVars();
+        playerTransform.GetComponent<PlayerTruck>().SetHomeAngle(0);
+        playerTransform.GetComponent<PlayerTruck>().SetFacingAngle(0);
+        rotTarget = null;
     }
 }

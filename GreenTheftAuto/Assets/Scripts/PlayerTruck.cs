@@ -26,6 +26,9 @@ public class PlayerTruck : MonoBehaviour
     [SerializeField] [Tooltip("Increases the truck's forward speed when held")] private KeyCode gasKey = KeyCode.UpArrow;
     [SerializeField] [Tooltip("Decreases the truck's forward speed when held")] private KeyCode brakeKey = KeyCode.DownArrow;
 
+    [Header("Debug")]
+    [SerializeField] [Tooltip("0 - original, accelerates back down to 0 first | 1 - zeroed, accelerates from 0 immediately | 2 - mirrored, rotational speed is preserved when turning")] private int turnType;
+
     private void Start()
     {
         // Initialize the angle the truck is facing as being between its two bounds.
@@ -57,7 +60,19 @@ public class PlayerTruck : MonoBehaviour
             if (deltaAngle > 0)
             {
                 // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual ~~REWRITE~~
-                deltaAngle = 0;
+                switch (turnType)
+                {
+                    case 0:
+                        deltaAngle -= turnDecel;
+                        break;
+                    case 1:
+                        deltaAngle = 0;
+                        break;
+                    case 2:
+                        deltaAngle = -deltaAngle;
+                        break;
+                }
+                
             }
             if (deltaAngle < -maxDeltaAngle)
             {
@@ -72,7 +87,18 @@ public class PlayerTruck : MonoBehaviour
             if (deltaAngle < 0)
             {
                 // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual ~~REWRITE~~
-                deltaAngle = 0;
+                switch (turnType)
+                {
+                    case 0:
+                        deltaAngle += turnDecel;
+                        break;
+                    case 1:
+                        deltaAngle = 0;
+                        break;
+                    case 2:
+                        deltaAngle = -deltaAngle;
+                        break;
+                }
             }
             if (deltaAngle > maxDeltaAngle)
             {
@@ -176,5 +202,10 @@ public class PlayerTruck : MonoBehaviour
         float halfOfRange = (angleHighBound - angleLowBound) / 2;
         angleHighBound = newHomeAngle + halfOfRange;
         angleLowBound = newHomeAngle - halfOfRange;
+    }
+
+    public void SetFacingAngle(float newFacingAngle)
+    {
+        facingAngle = newFacingAngle;
     }
 }
