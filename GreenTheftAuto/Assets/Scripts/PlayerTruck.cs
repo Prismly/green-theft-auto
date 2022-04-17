@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerTruck : MonoBehaviour
 {
@@ -43,6 +44,9 @@ public class PlayerTruck : MonoBehaviour
         float timeScaledSpeed = ProcessForwardInput();
         // Move the truck according to the value determined by ProcessForwardInput().
         transform.position += transform.forward * timeScaledSpeed;
+        if (transform.position.y < -10) {
+            SceneManager.LoadScene("GameOver");
+        }
     }
 
     /*
