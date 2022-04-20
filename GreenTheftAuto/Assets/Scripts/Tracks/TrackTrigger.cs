@@ -25,7 +25,16 @@ public class TrackTrigger : MonoBehaviour
             else
             {
                 UpdatePlayerHomeAngle(other);
-                mainCam.SetRotTarget(connectedTrack.GetChild(transform.parent.GetSiblingIndex() + 1));
+                Debug.Log(transform.parent.GetSiblingIndex());
+                Debug.Log(transform.parent.parent.childCount);
+                if (transform.parent.GetSiblingIndex() >= transform.parent.parent.childCount - 1)
+                {
+                    mainCam.SetRotTarget(connectedTrack.GetChild(0));
+                }
+                else
+                {
+                    mainCam.SetRotTarget(connectedTrack.GetChild(transform.parent.GetSiblingIndex() + 1));
+                }
             }
         }
     }
@@ -38,6 +47,13 @@ public class TrackTrigger : MonoBehaviour
             // There is at least one path segment remaining from this point. Change the player's max and min angles for the upcoming segment.
             Vector3 from = new Vector3(transform.parent.position.x, 0, transform.parent.position.z);
             Vector3 to = new Vector3(connectedTrack.GetChild(sibIndex + 1).position.x, 0, connectedTrack.GetChild(sibIndex + 1).position.z);
+            float newHomeAngle = Quaternion.LookRotation(to - from, Vector3.up).eulerAngles.y;
+            other.GetComponent<PlayerTruck>().SetHomeAngle(newHomeAngle);
+        }
+        else
+        {
+            Vector3 from = new Vector3(transform.parent.position.x, 0, transform.parent.position.z);
+            Vector3 to = new Vector3(connectedTrack.GetChild(1).position.x, 0, connectedTrack.GetChild(1).position.z);
             float newHomeAngle = Quaternion.LookRotation(to - from, Vector3.up).eulerAngles.y;
             other.GetComponent<PlayerTruck>().SetHomeAngle(newHomeAngle);
         }

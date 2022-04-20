@@ -48,13 +48,21 @@ public class CameraController : MonoBehaviour
             {
                 // There is at least one more segment for the camera to follow; start following it
                 pathIndex++;
-                targetPathPoint = currentTrack.GetChild(pathIndex + 1);
-                distFromTarget = Vector3.Distance(transform.position, targetPathPoint.position);
+                if (pathIndex == currentTrack.childCount - 1)
+                {
+                    targetPathPoint = currentTrack.GetChild(0);
+                }
+                else
+                {
+                    targetPathPoint = currentTrack.GetChild(pathIndex + 1);
+                }
             }
             else
             {
-                followingTrack = false;
+                pathIndex = 0;
+                targetPathPoint = currentTrack.GetChild(1);
             }
+            distFromTarget = Vector3.Distance(transform.position, targetPathPoint.position);
         }
 
         bool doSlerp = false;
@@ -62,9 +70,13 @@ public class CameraController : MonoBehaviour
         if (distFromTarget < slerpTime * followSpeed / 2 && pathIndex < currentTrack.childCount - 1 && pathIndex == lookIndex - 1)
         {
             lookIndex++;
+            if (lookIndex >= currentTrack.childCount)
+            {
+                lookIndex = 0;
+            }
             rotTarget = currentTrack.GetChild(lookIndex);
-            GameObject newDebugSphereBottomText = Instantiate(debugSphereBottomText);
-            newDebugSphereBottomText.transform.position = rotTarget.position;
+            //GameObject newDebugSphereBottomText = Instantiate(debugSphereBottomText);
+            //newDebugSphereBottomText.transform.position = rotTarget.position;
             doSlerp = true;
         }
         else if (rotTarget != null)

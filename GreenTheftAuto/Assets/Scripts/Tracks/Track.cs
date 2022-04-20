@@ -29,7 +29,7 @@ public class Track : MonoBehaviour
 
     public Color GetTrackColor()
     {
-        return Track.GetTrackColorFromEnum(lineColor);
+        return GetTrackColorFromEnum(lineColor);
     }
 
     private void OnDrawGizmos()

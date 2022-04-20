@@ -193,6 +193,7 @@ public class PlayerTruck : MonoBehaviour
 
         // Update the variable tracking the truck's current angle, and return by how much it should rotate this frame.
         facingAngle += timeScaledDeltaAngle;
+        facingAngle = facingAngle % 360;
         return timeScaledDeltaAngle;
     }
 
@@ -235,7 +236,7 @@ public class PlayerTruck : MonoBehaviour
 
     public void SetFacingAngle(float newFacingAngle)
     {
-        facingAngle = newFacingAngle;
+        facingAngle = newFacingAngle % 360;
     }
 
     private float TurnSpeedFactor()
