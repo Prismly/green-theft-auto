@@ -7,6 +7,7 @@ public class PlayerTruck : MonoBehaviour
     [Header("Driving")]
     [SerializeField] [Tooltip("The current speed, in units per second, of the player truck")] private float speed;
     [SerializeField] [Tooltip("The maximum speed, in units per second, of the player truck")] private float maxSpeed;
+    
     [SerializeField] [Tooltip("The minimum speed, in units per second, of the player truck")] private float minSpeed;
     [SerializeField] [Tooltip("Acceleration/deceleration of the truck's speed, in units per second^2")] private float driveAccel;
     
@@ -28,6 +29,10 @@ public class PlayerTruck : MonoBehaviour
     [SerializeField] [Tooltip("Increases the truck's forward speed when held")] private KeyCode gasKey = KeyCode.UpArrow;
     [SerializeField] [Tooltip("Decreases the truck's forward speed when held")] private KeyCode brakeKey = KeyCode.DownArrow;
 
+    [Header("Damage")]
+    [SerializeField] private SpeedBar speedBar;
+    private float maxSpeedActual;
+
     [Header("Debug")]
     [SerializeField] [Tooltip("0 - original, accelerates back down to 0 first | 1 - zeroed, accelerates from 0 immediately | 2 - mirrored, rotational speed is preserved when turning")] private int turnType;
 
@@ -35,6 +40,7 @@ public class PlayerTruck : MonoBehaviour
     {
         // Initialize the angle the truck is facing as being between its two bounds.
         facingAngle = (angleHighBound + angleLowBound) / 2;
+        maxSpeedActual = maxSpeed;
     }
 
     private void Update()
@@ -189,10 +195,10 @@ public class PlayerTruck : MonoBehaviour
         {
             // Player is SPEEDING UP
             speed += driveAccel * Time.deltaTime;
-            if (speed > maxSpeed)
+            if (speed > maxSpeedActual)
             {
                 // Speed has accelerated past what is allowed; cap it
-                speed = maxSpeed;
+                speed = maxSpeedActual;
             }
         }
         else if (!Input.GetKey(gasKey) && Input.GetKey(brakeKey))
@@ -228,5 +234,34 @@ public class PlayerTruck : MonoBehaviour
     private float TurnSpeedFactor()
     {
         return minTurnAccelDecelFactor + ((1 - minTurnAccelDecelFactor) / (maxSpeed - minSpeed)) * (speed - minSpeed);
+    }
+
+    public float GetSpeed()
+    {
+        return speed;
+    }
+
+    public float GetMaxSpeed()
+    {
+        return maxSpeed;
+    }
+
+    public float GetMinSpeed()
+    {
+        return minSpeed;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Damaging")
+        {
+            speedBar.UpdateSegmentsDestroyedByAmount(1);
+            int remainingHP = speedBar.GetGaugeHP() - speedBar.GetSegmentsDestroyed();
+            maxSpeedActual = ((maxSpeed - minSpeed) / speedBar.GetGaugeHP()) * remainingHP + minSpeed;
+            if(speed > maxSpeedActual)
+            {
+                speed = maxSpeedActual;
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour
 {
     [SerializeField] [Tooltip("The player character object")] private Transform playerTransform;
     [SerializeField] [Tooltip("The track that the camera is currently following")] private Transform currentTrack;
+    [SerializeField] private GameObject objectToMove;
     private Transform originalTrackDebug;
     [SerializeField] [Tooltip("The speed at which the camera moves along its current track, in units / second")] private float followSpeed;
     [SerializeField] [Tooltip("The time it should take for the camera to rotate between two points, in seconds")] private float slerpTime;
@@ -75,7 +76,7 @@ public class CameraController : MonoBehaviour
         {
             Quaternion targetRotation = Quaternion.LookRotation(rotTarget.position - transform.position, Vector3.up);
             targetRotation.eulerAngles = targetRotation.eulerAngles + offsetRotation;
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, slerpTime * Time.deltaTime);
+            objectToMove.transform.rotation = Quaternion.Slerp(objectToMove.transform.rotation, targetRotation, slerpTime * Time.deltaTime);
             if (Quaternion.Angle(targetRotation, transform.rotation) < 0.1f)
             {
                 // The camera has finished rotating; no need to call Slerp until next path point
@@ -85,7 +86,7 @@ public class CameraController : MonoBehaviour
 
         if (followingTrack)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPathPoint.position, followSpeed * Time.deltaTime);
+            objectToMove.transform.position = Vector3.MoveTowards(transform.position, targetPathPoint.position, followSpeed * Time.deltaTime);
         }
     }
 
