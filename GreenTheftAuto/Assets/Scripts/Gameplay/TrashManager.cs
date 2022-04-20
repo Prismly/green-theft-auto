@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class TrashManager : MonoBehaviour
 {
-    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject playerGreen;
+    [SerializeField] private GameObject playerOrange;
+    [SerializeField] private GameObject playerRed;
     [SerializeField] private float trashPerMinute;
     private float secondsPerTrash;
     private float timer;
@@ -21,6 +23,7 @@ public class TrashManager : MonoBehaviour
     [SerializeField] private float projectileGrav;
     [SerializeField] private int groundFindAttempts;
     [SerializeField] GameObject pointSystem;
+    [SerializeField] GameObject audioManager;
 
     // Start is called before the first frame update
     private void Start()
@@ -28,6 +31,11 @@ public class TrashManager : MonoBehaviour
         secondsPerTrash = 60 / trashPerMinute;
         areaSizeX = GetComponent<BoxCollider>().size.x;
         areaSizeZ = GetComponent<BoxCollider>().size.z;
+    }
+
+    public void AddDifficulty()
+    {
+        trashPerMinute += 2;
     }
 
     // Update is called once per frame
@@ -73,8 +81,9 @@ public class TrashManager : MonoBehaviour
         newTarget.GetComponent<Target>().SetPrimedRotSpeed(primedRotSpeed);
         newTarget.GetComponent<Target>().SetRotationSpeed(unprimedRotSpeed);
         newTarget.GetComponent<Target>().SetMyManager(this);
-        newTarget.GetComponent<Target>().SetPlayer(player);
+        newTarget.GetComponent<Target>().SetPlayers(playerGreen, playerOrange, playerRed);
         newTarget.GetComponent<Target>().SetPointSystemRef(pointSystem.GetComponent<PointSystem>());
+        newTarget.GetComponent<Target>().SetAudioManager(audioManager);
     }
 
     public void LaunchProjectileAt(Vector3 localTarget)

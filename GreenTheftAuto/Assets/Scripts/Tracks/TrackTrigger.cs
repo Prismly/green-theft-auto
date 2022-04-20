@@ -6,6 +6,7 @@ public class TrackTrigger : MonoBehaviour
 {
     [SerializeField] [Tooltip("The instance of the camera script that manages the camera's movement")] private CameraController mainCam;
     private Transform connectedTrack;
+    [SerializeField] private GameObject playArea;
 
     private void Start()
     {
@@ -16,6 +17,7 @@ public class TrackTrigger : MonoBehaviour
     {
         if (other.tag == "Player")
         {
+            playArea.GetComponent<TrashManager>().AddDifficulty();
             if (mainCam.GetCurrentTrack() != connectedTrack)
             {
                 mainCam.SetCurrentTrack(connectedTrack);

@@ -36,6 +36,7 @@ public class PlayerTruck : MonoBehaviour
 
     [Header("Points")]
     [SerializeField] private PointSystem pointSystem;
+    [SerializeField] private AudioManager audioManager;
 
     [Header("Debug")]
     [SerializeField] [Tooltip("0 - original, accelerates back down to 0 first | 1 - zeroed, accelerates from 0 immediately | 2 - mirrored, rotational speed is preserved when turning")] private int turnType;
@@ -274,6 +275,7 @@ public class PlayerTruck : MonoBehaviour
         else if (other.tag == "Collectible")
         {
             Destroy(other.gameObject);
+            audioManager.Play("happy");
             pointSystem.AddPoints(PointSystem.binValue, "Picked up a bin!");
         }
     }

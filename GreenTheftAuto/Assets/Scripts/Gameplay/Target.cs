@@ -18,12 +18,22 @@ public class Target : MonoBehaviour
     private bool damaging = false;
     private bool countedCloseCall = false;
     private bool countedHurt = false;
-    GameObject player;
+    GameObject playerGreen;
+    GameObject playerOrange;
+    GameObject playerRed;
     PointSystem pointSystem;
+    GameObject audioManager;
 
-    public void SetPlayer(GameObject playerTruck)
+    public void SetPlayers(GameObject green, GameObject orange, GameObject red)
     {
-        player = playerTruck;
+        playerGreen = green;
+        playerOrange = orange;
+        playerRed = red;
+    }
+
+    public void SetAudioManager(GameObject am)
+    {
+        audioManager = am;
     }
 
     public void SetTimeToPrime(float newVal)
@@ -84,7 +94,9 @@ public class Target : MonoBehaviour
             else if (timer >= timeToDamage && damaging)
             {
                 //Projectile is done doing damage, disappear
-                player.GetComponent<MeshRenderer>().material = normalTruck;
+                playerGreen.SetActive(true);
+                playerOrange.SetActive(false);
+                playerRed.SetActive(false);
                 Destroy(gameObject);
             }
         }
@@ -96,16 +108,21 @@ public class Target : MonoBehaviour
         {
             if (damaging)
             {
-                other.GetComponent<MeshRenderer>().material = hurtTruck;
+                playerGreen.SetActive(false);
+                playerOrange.SetActive(false);
+                playerRed.SetActive(true);
                 if (!countedHurt)
                 {
                     pointSystem.AddPoints(PointSystem.damageValue, "Hit by trash...");
+                    audioManager.GetComponent<AudioManager>().Play("sad");
                     countedHurt = true;
                 }
             }
             else
             {
-                other.GetComponent<MeshRenderer>().material = dangerTruck;
+                playerGreen.SetActive(false);
+                playerOrange.SetActive(true);
+                playerRed.SetActive(false);
                 if (!countedCloseCall)
                 {
                     pointSystem.AddPoints(PointSystem.dodgeValue, "Close call!");
