@@ -34,6 +34,9 @@ public class PlayerTruck : MonoBehaviour
     [SerializeField] private SpeedBar speedBar;
     private float maxSpeedActual;
 
+    [Header("Points")]
+    [SerializeField] private PointSystem pointSystem;
+
     [Header("Debug")]
     [SerializeField] [Tooltip("0 - original, accelerates back down to 0 first | 1 - zeroed, accelerates from 0 immediately | 2 - mirrored, rotational speed is preserved when turning")] private int turnType;
 

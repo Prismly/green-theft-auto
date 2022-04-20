@@ -55,7 +55,7 @@ public class TrashManager : MonoBehaviour
             randZ -= areaSizeZ / 2;
             int layerMask = LayerMask.GetMask("Ground");
 
-            Debug.Log(transform.TransformPoint(new Vector3(randX, 15, randZ)));
+            //Debug.Log(transform.TransformPoint(new Vector3(randX, 15, randZ)));
             if (Physics.Raycast(transform.TransformPoint(new Vector3(randX, 15, randZ)), Vector3.down, 30, layerMask))
             {
                 found = true;
