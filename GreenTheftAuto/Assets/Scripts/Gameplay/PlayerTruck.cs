@@ -271,5 +271,10 @@ public class PlayerTruck : MonoBehaviour
                 speed = maxSpeedActual;
             }
         }
+        else if (other.tag == "Collectible")
+        {
+            Destroy(other.gameObject);
+            pointSystem.AddPoints(PointSystem.binValue, "Picked up a bin!");
+        }
     }
 }

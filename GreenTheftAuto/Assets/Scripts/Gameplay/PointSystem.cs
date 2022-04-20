@@ -10,37 +10,42 @@ public class PointSystem : MonoBehaviour
     [SerializeField] GameObject redText;
     [SerializeField] GameObject canvas;
     [SerializeField] float changeTextSpeed;
-    static int points;
-    static int binValue = 1000;
-    static int damageValue = -250;
-    static int dodgeValue = 25;
+    static public int points;
+    static public int binValue = 1000;
+    static public int damageValue = -250;
+    static public int dodgeValue = 25;
 
     static public void ResetPoints()
     {
         points = 0;
     }
 
-    public void AddPoints(int toAdd)
+    static public int GetPoints()
+    {
+        return points;
+    }
+
+    public void AddPoints(int toAdd, string details)
     {
         points += toAdd;
         if (toAdd >= 0)
         {
-            StartCoroutine(ChangeText(greenText, toAdd));
+            StartCoroutine(ChangeText(greenText, toAdd, details));
         }
         else
         {
-            StartCoroutine(ChangeText(redText, toAdd));
+            StartCoroutine(ChangeText(redText, toAdd, details));
         }
         whiteText.GetComponent<TextMeshProUGUI>().text = "Points: " + points;
     }
 
-    IEnumerator ChangeText(GameObject target, int toAdd)
+    IEnumerator ChangeText(GameObject target, int toAdd, string details)
     {
         GameObject newTarget = Instantiate(target);
         newTarget.SetActive(true);
         newTarget.transform.SetParent(canvas.transform);
         newTarget.GetComponent<RectTransform>().position = target.GetComponent<RectTransform>().position;
-        newTarget.GetComponent<TextMeshProUGUI>().text = "+" + toAdd;
+        newTarget.GetComponent<TextMeshProUGUI>().text = "+" + toAdd + " (" + details + ")";
         Color c = newTarget.GetComponent<TextMeshProUGUI>().color;
         for (float alpha = 1f; alpha >= 0; alpha -= Time.deltaTime)
         {

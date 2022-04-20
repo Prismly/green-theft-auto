@@ -20,6 +20,7 @@ public class TrashManager : MonoBehaviour
     [SerializeField] private float timeToDamage;
     [SerializeField] private float projectileGrav;
     [SerializeField] private int groundFindAttempts;
+    [SerializeField] GameObject pointSystem;
 
     // Start is called before the first frame update
     private void Start()
@@ -73,6 +74,7 @@ public class TrashManager : MonoBehaviour
         newTarget.GetComponent<Target>().SetRotationSpeed(unprimedRotSpeed);
         newTarget.GetComponent<Target>().SetMyManager(this);
         newTarget.GetComponent<Target>().SetPlayer(player);
+        newTarget.GetComponent<Target>().SetPointSystemRef(pointSystem.GetComponent<PointSystem>());
     }
 
     public void LaunchProjectileAt(Vector3 localTarget)

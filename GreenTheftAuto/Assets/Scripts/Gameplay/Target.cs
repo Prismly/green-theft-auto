@@ -6,6 +6,7 @@ public class Target : MonoBehaviour
 {
     [SerializeField] Material normalTruck;
     [SerializeField] Material dangerTruck;
+    [SerializeField] Material hurtTruck;
     [SerializeField] GameObject damageCollider;
     private TrashManager myManager;
     private float timeToPrime;
@@ -15,7 +16,10 @@ public class Target : MonoBehaviour
     private float timer;
     private bool primed = false;
     private bool damaging = false;
+    private bool countedCloseCall = false;
+    private bool countedHurt = false;
     GameObject player;
+    PointSystem pointSystem;
 
     public void SetPlayer(GameObject playerTruck)
     {
@@ -52,6 +56,11 @@ public class Target : MonoBehaviour
         myManager = manager;
     }
 
+    public void SetPointSystemRef(PointSystem ps)
+    {
+        pointSystem = ps;
+    }
+
     private void Update()
     {
         timer += Time.deltaTime;
@@ -85,7 +94,24 @@ public class Target : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            other.GetComponent<MeshRenderer>().material = dangerTruck;
+            if (damaging)
+            {
+                other.GetComponent<MeshRenderer>().material = hurtTruck;
+                if (!countedHurt)
+                {
+                    pointSystem.AddPoints(PointSystem.damageValue, "Hit by trash...");
+                    countedHurt = true;
+                }
+            }
+            else
+            {
+                other.GetComponent<MeshRenderer>().material = dangerTruck;
+                if (!countedCloseCall)
+                {
+                    pointSystem.AddPoints(PointSystem.dodgeValue, "Close call!");
+                    countedCloseCall = true;
+                }
+            }
         }
     }
 

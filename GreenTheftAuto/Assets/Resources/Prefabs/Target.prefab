@@ -64,6 +64,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normalTruck: {fileID: 2100000, guid: 5870da22e8d5f1943bba2aff5aec5cbc, type: 2}
   dangerTruck: {fileID: 2100000, guid: 21010575064604641aad45e74a1edc22, type: 2}
+  hurtTruck: {fileID: 2100000, guid: f177e57ef1ef8f64e8a91276d8b6f070, type: 2}
   damageCollider: {fileID: 9071771770706903854}
 --- !u!114 &4253965855583287390
 MonoBehaviour:
