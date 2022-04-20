@@ -889,7 +889,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 374340947}
   currentTrack: {fileID: 588773278}
-  followSpeed: 6
+  followSpeed: 5
   slerpTime: 1
   offsetRotation: {x: 10, y: 0, z: 0}
   debugSphereBottomText: {fileID: 7740412837625112906, guid: 05b5427a5dc0b1544b1c00130041475d, type: 3}
@@ -1538,7 +1538,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2194837375916490017, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
       propertyPath: turnType
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2194837375916490017, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
       propertyPath: turnAccel
@@ -1547,6 +1547,14 @@ PrefabInstance:
     - target: {fileID: 2194837375916490017, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
       propertyPath: turnDecel
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2194837375916490017, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
+      propertyPath: preservedTurnFactor
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2194837375916490017, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
+      propertyPath: minTurnAccelDecelFactor
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 2194837375916490022, guid: f452a3fa57b0dec4cb2e3100c5d665bc, type: 3}
       propertyPath: m_RootOrder

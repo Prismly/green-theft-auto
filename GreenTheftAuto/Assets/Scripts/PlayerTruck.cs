@@ -18,7 +18,9 @@ public class PlayerTruck : MonoBehaviour
     [SerializeField] [Tooltip("Acceleration of the truck's turning, in degrees per second^2")] private float turnAccel;
     [SerializeField] [Tooltip("")] private float maxDeltaAngle;
     [SerializeField] [Tooltip("Deceleration of the truck's turning, in degrees per second^2")] private float turnDecel;
-    private float deltaAngle = 0; // Saves the number of degrees rotated during the most recent frame, so accel/deceleration can be applied
+    [SerializeField] private float preservedTurnFactor;
+    [SerializeField] private float minTurnAccelDecelFactor;
+    [SerializeField] private float deltaAngle = 0; // Saves the number of degrees rotated during the most recent frame, so accel/deceleration can be applied
     
     [Header("Keybinds")]
     [SerializeField] [Tooltip("Turns the truck left when held")] private KeyCode leftKey = KeyCode.LeftArrow;
@@ -56,20 +58,27 @@ public class PlayerTruck : MonoBehaviour
         if (Input.GetKey(leftKey) && !Input.GetKey(rightKey))
         {
             // Player holding LEFT turn key
-            deltaAngle -= turnAccel;
+            deltaAngle -= turnAccel * TurnSpeedFactor();
             if (deltaAngle > 0)
             {
                 // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual ~~REWRITE~~
                 switch (turnType)
                 {
                     case 0:
-                        deltaAngle -= turnDecel;
+                        // Slow turning, decel then accel
+                        deltaAngle += turnDecel;
                         break;
                     case 1:
+                        // Medium turning, immediately start accel
                         deltaAngle = 0;
                         break;
                     case 2:
+                        // Fast turning, turn speed is translated 1:1
                         deltaAngle = -deltaAngle;
+                        break;
+                    case 3:
+                        // Fast turning adjusted, turn speed is translated 1:x, where x needs tweaking
+                        deltaAngle = -preservedTurnFactor * deltaAngle;
                         break;
                 }
                 
@@ -83,20 +92,27 @@ public class PlayerTruck : MonoBehaviour
         else if (!Input.GetKey(leftKey) && Input.GetKey(rightKey))
         {
             // Player holding RIGHT turn key
-            deltaAngle += turnAccel;
+            deltaAngle += turnAccel * TurnSpeedFactor();
             if (deltaAngle < 0)
             {
                 // Player is trying to turn in the direction opposite to how the truck is rotating; accelerate more than usual ~~REWRITE~~
                 switch (turnType)
                 {
                     case 0:
+                        // Slow turning, decel then accel
                         deltaAngle += turnDecel;
                         break;
                     case 1:
+                        // Medium turning, immediately start accel
                         deltaAngle = 0;
                         break;
                     case 2:
+                        // Fast turning, turn speed is translated 1:1
                         deltaAngle = -deltaAngle;
+                        break;
+                    case 3:
+                        // Fast turning adjusted, turn speed is translated 1:x, where x needs tweaking
+                        deltaAngle = -preservedTurnFactor * deltaAngle;
                         break;
                 }
             }
@@ -114,7 +130,7 @@ public class PlayerTruck : MonoBehaviour
                 // Some amount of rotation is happening on this frame, so we should decelerate the rotation.
                 if (deltaAngle > 0)
                 {
-                    deltaAngle -= turnDecel;
+                    deltaAngle -= turnDecel * TurnSpeedFactor();
                     if (deltaAngle < 0)
                     {
                         // We've decelerated so much, we've begun turning in the other direction! Stop rotation entirely.
@@ -123,7 +139,7 @@ public class PlayerTruck : MonoBehaviour
                 }
                 else
                 {
-                    deltaAngle += turnDecel;
+                    deltaAngle += turnDecel * TurnSpeedFactor();
                     if (deltaAngle > 0)
                     {
                         // We've decelerated so much, we've begun turning in the other direction! Stop rotation entirely.
@@ -207,5 +223,10 @@ public class PlayerTruck : MonoBehaviour
     public void SetFacingAngle(float newFacingAngle)
     {
         facingAngle = newFacingAngle;
+    }
+
+    private float TurnSpeedFactor()
+    {
+        return minTurnAccelDecelFactor + ((1 - minTurnAccelDecelFactor) / (maxSpeed - minSpeed)) * (speed - minSpeed);
     }
 }
